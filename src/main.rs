@@ -1,22 +1,25 @@
-use dialoguer::console::Term;
-use dialoguer::{Select, theme::ColorfulTheme};
-use std::fs;
 use std::io;
+
+pub mod utils;
 fn main() -> io::Result<()> {
-    // Pull everything in cucrent pwd into a vector of strings
-    let paths: Vec<String> = fs::read_dir("./")?
-        .map(|res| res.map(|e| e.path().to_string_lossy().into_owned()))
-        .collect::<Result<Vec<_>, io::Error>>()?;
+    // Keep track of directory
+    let file_string: String = String::from("./");
 
-    let selection = Select::with_theme(&ColorfulTheme::default())
-        .with_prompt("Select")
-        .default(0)
-        .items(&paths[..])
-        .interact_on_opt(&Term::stderr())?;
-    match selection {
-        Some(index) => println!("User selected: {:?}", paths[index]),
-        None => println!("User did not select anything"),
+    while utils::directory_check(&file_string) {
+        // Get all valid files (directory or .py)
+        let valid_files: Result<Vec<String>, io::Error> = utils::read_directory(&file_string);
+
+        if valid_files.is_ok() {
+            // Create a selection in the cli
+            let selected_file: String = utils::create_selection(valid_files?);
+
+            // Check if can execute or it is a directory
+            if !utils::check_py(&selected_file) {
+                utils::go_child(&selected_file);
+            } else {
+                utils::execute(&selected_file);
+            }
+        }
     }
-
     Ok(())
 }
