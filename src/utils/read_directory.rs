@@ -2,9 +2,9 @@ use std::fs;
 use std::io;
 
 use crate::utils::file_check::file_check;
-pub fn read_directory() -> Result<Vec<String>, io::Error> {
+pub fn read_directory(current_path: &str) -> Result<Vec<String>, io::Error> {
     // Pull everything in cucrent pwd into a vector of strings
-    let paths: Result<fs::ReadDir, io::Error> = fs::read_dir("./");
+    let paths: Result<fs::ReadDir, io::Error> = fs::read_dir(current_path);
     let mut valid_files: Vec<String> = Vec::new();
     if paths.is_ok() {
         let files: fs::ReadDir = paths.unwrap();
@@ -26,6 +26,8 @@ pub fn read_directory() -> Result<Vec<String>, io::Error> {
             }
         }
     }
+    // navigate to parent directory
+    valid_files.push(String::from("../"));
     // let paths: Vec<String> = fs::read_dir("./")?
     //     .map(|res| res.map(|e| file_check(e.path().to_string_lossy().into_owned())))
     //     .collect::<Result<Vec<_>, io::Error>>()?;
