@@ -12,11 +12,13 @@ pub fn read_directory(current_path: &str) -> Result<Vec<String>, io::Error> {
             let f = file?;
             let dir: bool = f.file_type().unwrap().is_dir();
             let mut name = f.path().to_str().unwrap().to_string();
+            // Add Slash to indicate directory
             if dir {
                 let mut tmp = name.to_string();
                 tmp.push_str("/");
                 name = tmp;
             }
+            // Check file is a directory, or python file
             let res = file_check(name);
             match res {
                 Some(res) => {
